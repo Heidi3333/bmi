@@ -1,0 +1,65 @@
+import speech_recognition as sr
+
+# Function to transcribe speech
+def transcribe_speech(language, api):
+    r = sr.Recognizer()
+    audio = None
+
+    try:
+        with sr.Microphone() as source:
+            print("Listening...")
+
+            audio = r.listen(source)  # Listen for audio input
+
+        if api == "google":
+            transcript = r.recognize_google(audio, language=language)  # Transcribe using Google Speech Recognition
+        elif api == "sphinx":
+            transcript = r.recognize_sphinx(audio, language=language)  # Transcribe using CMU Sphinx
+
+    except sr.UnknownValueError:
+        print("Error: Unable to recognize speech")
+    except sr.RequestError as e:
+        print(f"Error: {str(e)}")
+
+    return transcript
+
+# Function to save transcript to a file
+def save_transcript(transcript, filename):
+    with open(filename, "w") as file:
+        file.write(transcript)
+
+    print(f"Transcript saved to {filename}")
+
+# Main function
+def main():
+    print("Welcome to the Speech Recognition App!")
+    print("Select an option:")
+    print("1. Google Speech Recognition")
+    print("2. CMU Sphinx")
+
+    choice = input("Enter your choice (1 or 2): ")
+
+    if choice == "1":
+        api = "google"
+    elif choice == "2":
+        api = "sphinx"
+    else:
+        print("Invalid choice. Please try again.")
+        return
+
+    language = input("Enter the language you are speaking in (e.g., en-US): ")
+
+    print(f"Using {api.upper()} API for {language} language.")
+
+    transcript = transcribe_speech(language, api)
+
+    print("Transcript:", transcript)
+
+    save_option = input("Do you want to save the transcript? (y/n): ")
+
+    if save_option.lower() == "y":
+        filename = input("Enter the filename to save the transcript: ")
+        save_transcript(transcript, filename)
+
+if __name__ == "__main__":
+    main()
